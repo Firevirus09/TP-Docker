@@ -1,0 +1,59 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  55.81kB
+Step 1/9 : FROM node:22-alpine AS build
+ ---> 0e1754758c2d
+Step 2/9 : WORKDIR /app
+ ---> Running in 0f524bb4ead2
+ ---> Removed intermediate container 0f524bb4ead2
+ ---> 6863cfeaaad7
+Step 3/9 : COPY app/package*.json ./
+ ---> 6736e36915fb
+Step 4/9 : RUN npm ci
+ ---> Running in 10bf33eee8cf
+
+added 27 packages, and audited 28 packages in 2s
+
+10 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+[91mnpm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+[0m ---> Removed intermediate container 10bf33eee8cf
+ ---> 876550254a9f
+Step 5/9 : COPY app/ .
+ ---> ef1777767068
+Step 6/9 : RUN npm run build
+ ---> Running in ccea45bdfc97
+
+> app@0.0.0 build
+> vite build
+
+vite v8.3.6 building client environment for production...
+transforming...
+✓ 16 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.52 kB │ gzip:  0.31 kB
+dist/assets/index-gDGjVDdR.css    1.10 kB │ gzip:  0.57 kB
+dist/assets/index-CP9mdoqg.js   220.84 kB │ gzip: 69.15 kB
+
+✓ built in 71ms
+ ---> Removed intermediate container ccea45bdfc97
+ ---> 49591fe4464d
+Step 7/9 : FROM nginxinc/nginx-unprivileged:1.28-alpine
+ ---> 7377697a821c
+Step 8/9 : COPY --from=build /app/dist /usr/share/nginx/html
+ ---> 1f5c40e3dcbd
+Step 9/9 : EXPOSE 8080
+ ---> Running in fa986234d415
+ ---> Removed intermediate container fa986234d415
+ ---> d655983bd1f3
+Successfully built d655983bd1f3
+Successfully tagged memo-docker:1.0

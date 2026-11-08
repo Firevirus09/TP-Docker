@@ -1,0 +1,61 @@
+$ docker images (image finale et image de build)
+REPOSITORY:TAG                            SIZE
+memo-docker:1.0                           81.6MB
+node:22-alpine                            235MB
+
+$ docker ps --filter name=memo
+NAMES     IMAGE             STATUS        PORTS
+memo      memo-docker:1.0   Up 1 second   0.0.0.0:9090->8080/tcp, [::]:9090->8080/tcp
+
+$ curl -i http://localhost:9090/
+HTTP/1.1 200 OK
+Server: nginx/1.28.2
+Date: Sun, 08 Nov 2026 10:12:23 GMT
+Content-Type: text/html
+Content-Length: 523
+Last-Modified: Sun, 08 Nov 2026 10:12:22 GMT
+Connection: keep-alive
+ETag: "6af04b06-20b"
+Accept-Ranges: bytes
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Aide-mémoire interactif des commandes Docker" />
+    <link rel="icon" href="data:," />
+    <title>Mémo Docker</title>
+    <script type="module" crossorigin src="/assets/index-CP9mdoqg.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-gDGjVDdR.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+
+$ curl -o /dev/null -w "%{http_code} %{content_type}" (fichiers construits)
+/assets/index-CP9mdoqg.js -> 200 application/javascript
+/assets/index-gDGjVDdR.css -> 200 text/css
+
+$ docker exec memo id
+uid=101(nginx) gid=101(nginx) groups=101(nginx)
+
+$ docker exec memo sh -c "command -v node || echo node absent; command -v npm || echo npm absent; test -e /app || echo /app absent"
+node absent
+npm absent
+/app absent
+
+Test navigateur (Chrome headless, clic sur 2 cases)
+titre        : Mémo Docker
+h1           : Mémo Docker
+lignes       : 6
+avant clic   : 0 / 6 commandes essayées
+apres 2 clics: 2 / 6 commandes essayées
+erreurs JS   : 0
+requetes KO  : 0 
+
+$ docker logs memo (extrait, requetes du navigateur)
+172.17.0.1 - - [08/Nov/2026:10:12:24 +0000] "GET / HTTP/1.1" 200 523 
+172.17.0.1 - - [08/Nov/2026:10:12:24 +0000] "GET /assets/index-gDGjVDdR.css HTTP/1.1" 200 1105 
+172.17.0.1 - - [08/Nov/2026:10:12:24 +0000] "GET /assets/index-CP9mdoqg.js HTTP/1.1" 200 220840 
