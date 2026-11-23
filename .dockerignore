@@ -10,3 +10,6 @@ preuves
 **/.env.*
 **/*.log
 **/.DS_Store
+
+# Métadonnées macOS (disque externe)
+._*

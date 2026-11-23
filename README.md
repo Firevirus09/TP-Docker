@@ -9,6 +9,7 @@ Application web simple, un aide-mémoire interactif des commandes Docker, créé
 ├── app/            # Sources de l'application (React + Vite)
 ├── preuves/        # Sorties de commandes et capture d'écran
 ├── Dockerfile      # Build multi-stage
+├── compose.yaml    # Lancement en une commande
 ├── .dockerignore   # Fichiers exclus de l'image
 └── .gitignore      # Fichiers exclus du dépôt
 ```
@@ -30,17 +31,42 @@ Application web simple, un aide-mémoire interactif des commandes Docker, créé
 Prérequis : Docker (Docker Desktop ou Colima). Node n'est pas nécessaire sur le poste, car le build se fait dans l'image.
 
 ```bash
-docker build -t memo-docker:1.0 .
-docker run -d --name memo -p 9090:8080 memo-docker:1.0
+docker compose up -d --build
 ```
 
-L'application est ensuite disponible sur <http://localhost:9090>.
+L'application est ensuite disponible sur <http://localhost:9090>. Grâce à `restart: unless-stopped` dans `compose.yaml`, elle redémarre automatiquement avec Docker.
 
-Pour arrêter et supprimer le conteneur :
+Pour l'arrêter :
 
 ```bash
-docker stop memo && docker rm memo
+docker compose down
 ```
+
+Sans Compose, l'équivalent est :
+
+```bash
+docker build -t memo-docker:1.0 .
+docker run -d --name memo -p 9090:8080 --restart unless-stopped memo-docker:1.0
+```
+
+> Avec Colima, lancer `brew services start colima` une seule fois pour que Docker démarre à l'ouverture de session.
+
+Les commandes `docker compose` se lancent depuis le dossier du projet :
+
+```bash
+cd "/Volumes/FireDisk/TP Docker"
+```
+
+## Dépannage
+
+| Problème | Solution |
+|---|---|
+| `failed to connect to the docker API ... docker.sock` | Docker (Colima) n'est pas démarré : `colima start` |
+| `Conflict. The container name "/memo" is already in use` | Un ancien conteneur existe : `docker rm -f memo`, puis relancer |
+| `failed to xattr ... ._fichier: operation not permitted` | Fichiers macOS parasites : `find . -name '._*' -delete`, puis relancer |
+| `port is already allocated` (9090) | Un autre conteneur utilise le port : `docker ps` pour le trouver, puis `docker stop <nom>` |
+| La page ne s'affiche pas après un redémarrage du Mac | Attendre ~30 s que Colima démarre, puis vérifier avec `docker ps` |
+| Le site n'affiche pas mes modifications | Reconstruire l'image : `docker compose up -d --build` |
 
 ## Tests
 

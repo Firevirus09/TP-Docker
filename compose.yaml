@@ -1,0 +1,9 @@
+services:
+  memo:
+    build: .
+    image: memo-docker:1.0
+    container_name: memo
+    ports:
+      - "9090:8080"
+    # Redémarre automatiquement le site quand Docker (Colima) redémarre
+    restart: unless-stopped
